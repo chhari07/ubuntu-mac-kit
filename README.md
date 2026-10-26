@@ -1,19 +1,19 @@
 # Ubuntu Mac Kit
 
 A portable, one-command installer for a complete macOS-style desktop on Ubuntu 24.04 (GNOME 46).
-Mac Bar also supports GNOME 47 and 48.
-Copy one archive to a new machine, run `./install.sh`, log out and back in.
+Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 ![Ubuntu 24.04](https://img.shields.io/badge/Ubuntu-24.04%20LTS-E95420.svg)
 ![GNOME 46 to 48](https://img.shields.io/badge/GNOME%20Shell-46%20to%2048-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
+![Before and after installation](docs/media/preview.gif)
+
+**[Watch the full install walkthrough](https://github.com/chhari07/ubuntu-mac-kit/releases/download/v1.1.0/ubuntu-mac-kit-walkthrough-1080p.mp4)**
+(1080p, 62 seconds, with captions and sound)
+
 ![Desktop after installation](docs/media/after.png)
-
-[![Install walkthrough video](docs/media/title.png)](docs/media/install-walkthrough.mp4)
-
-*Install walkthrough, 58 seconds. Select the image to play.*
 
 ## Contents
 
@@ -130,7 +130,7 @@ ubuntu-mac-kit/
 ├── apps/desktop-note/note.py   Sticky Notes app
 ├── assets/files-folder.svg     Files app icon
 ├── design/                     Design tokens (Figma Tokens format) and theme specification
-├── docs/media/                 Screenshots and walkthrough video
+├── docs/media/                 Screenshots, preview animation and walkthrough video
 └── tools/
     ├── build-bundle.sh         Builds the release archive
     ├── mac-file-icons-gen.py   Generates the macOS folder and file icons
@@ -161,10 +161,13 @@ gtk-update-icon-cache -f ~/.local/share/icons/WhiteSur-dark
 To render the walkthrough video (requires `python3-cairo` and `ffmpeg`):
 
 ```bash
-python3 tools/make_audio.py soundtrack.wav
-python3 tools/make_video.py silent.mp4
-ffmpeg -i silent.mp4 -i soundtrack.wav -c:v copy -c:a aac -shortest install-walkthrough.mp4
+# 1080p with burned-in captions and the closing card, as published on the release page
+python3 tools/make_audio.py soundtrack.wav 62.5
+python3 tools/make_video.py silent.mp4 --1080p --captions --endcard --srt walkthrough.srt
+ffmpeg -i silent.mp4 -i soundtrack.wav -c:v copy -c:a aac -shortest walkthrough-1080p.mp4
 ```
+
+Without flags, `make_video.py` renders the 720p version in `docs/media/install-walkthrough.mp4`.
 
 ## Troubleshooting
 

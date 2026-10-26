@@ -1,10 +1,23 @@
 #!/usr/bin/env python3
-"""Animated, illustrated how-to video: installing the Ubuntu Mac Kit."""
+"""Animated, illustrated how-to video: installing the Ubuntu Mac Kit.
+
+Usage: make_video.py OUT.mp4 [--1080p] [--captions] [--endcard] [--srt FILE]
+  --1080p     render at 1920x1080 instead of 1280x720
+  --captions  burn subtitles into the picture (for feeds that autoplay muted)
+  --endcard   add a closing card with the repository link
+  --srt FILE  also write the captions as an .srt subtitle file
+"""
 import math, subprocess, sys
 import cairo
 
 W, H, FPS = 1280, 720, 30
-OUT = sys.argv[1]
+ARGS = sys.argv[1:]
+OUT = ARGS[0] if ARGS else 'walkthrough.mp4'
+SCALE = 1.5 if '--1080p' in ARGS else 1.0
+CAPTIONS = '--captions' in ARGS
+ENDCARD = '--endcard' in ARGS
+SRT = ARGS[ARGS.index('--srt') + 1] if '--srt' in ARGS else None
+REPO_URL = 'github.com/chhari07/ubuntu-mac-kit'
 
 # theme-tokens.json colours
 def hx(s, a=1.0):
@@ -560,16 +573,70 @@ def s_end(cr, t, d):
     kk = ease(seg(t, 2.2, 3.0))
     text(cr, '…then log out and log back in.', W / 2, 590, 21, MUTED, a=kk, align='c')
 
+def s_repo(cr, t, d):
+    k = ease(seg(t, 0.1, 0.8))
+    cr.save(); cr.translate(W / 2, 205); s_ = back(seg(t, 0.0, 0.7)); cr.scale(s_, s_)
+    folder(cr, -60, -48, 120); cr.restore()
+    text(cr, 'Ubuntu Mac Kit', W / 2, 345, 54, FG, bold=True, a=k, align='c')
+    k2 = ease(seg(t, 0.5, 1.2))
+    cr.select_font_face(MONO, 0, 0); cr.set_font_size(26); tw = cr.text_extents(REPO_URL).x_advance + 56
+    rrect(cr, W / 2 - tw / 2, 382, tw, 56, 28); col(cr, BLUE, k2); cr.fill()
+    text(cr, REPO_URL, W / 2, 419, 26, FG, a=k2, align='c', font=MONO)
+    k3 = ease(seg(t, 0.9, 1.6))
+    text(cr, 'Ubuntu 24.04  ·  GNOME 46  ·  No sudo  ·  Full uninstall', W / 2, 492, 20, MUTED, a=k3, align='c')
+    text(cr, 'Free and open source (GPL-3.0)', W / 2, 524, 20, MUTED, a=k3, align='c')
+
+# (start, end, text) in seconds of the full video
+CAPTION_LINES = [
+    (0.4, 4.8, 'Ubuntu Mac Kit: my whole macOS-style desktop in one installer'),
+    (5.3, 9.0, 'Step 1: download the kit from GitHub Releases'),
+    (9.0, 12.3, 'One 14 MB file. It installs offline.'),
+    (12.8, 15.4, 'Step 2: extract the archive'),
+    (15.4, 20.2, 'Inside: install.sh, uninstall.sh and the theme files'),
+    (20.8, 24.0, 'Step 3: run ./install.sh (no sudo needed)'),
+    (24.0, 28.5, 'It backs up your settings, then applies icons, cursor, GTK, top bar and dock'),
+    (28.5, 31.8, 'Everything goes into your home folder'),
+    (32.3, 38.7, 'Step 4: log out and back in to load the new top bar'),
+    (39.3, 44.0, 'Step 5: before and after'),
+    (44.0, 47.2, 'Glass top bar, glass dock, blue macOS folders'),
+    (47.8, 52.7, 'Changed your mind? ./uninstall.sh restores everything'),
+    (53.3, 57.8, 'Three steps, then log out and back in'),
+    (58.2, 62.3, 'Link in the comments. Feedback welcome.'),
+]
+
+def draw_caption(cr, T):
+    for a, b, s in CAPTION_LINES:
+        if a <= T < b:
+            k = min(ease(seg(T, a, a + 0.2)), 1 - ease(seg(T, b - 0.2, b)))
+            cr.select_font_face(FONT, 0, cairo.FONT_WEIGHT_BOLD); cr.set_font_size(24)
+            tw = cr.text_extents(s).x_advance
+            rrect(cr, W / 2 - tw / 2 - 22, 652, tw + 44, 46, 12); cr.set_source_rgba(0, 0, 0, 0.78 * k); cr.fill()
+            text(cr, s, W / 2, 683, 24, FG, bold=True, a=k, align='c')
+
+def write_srt(path, total):
+    def ts(x):
+        ms = int(round(x * 1000)); h, ms = divmod(ms, 3600000); m, ms = divmod(ms, 60000); sec, ms = divmod(ms, 1000)
+        return f'{h:02d}:{m:02d}:{sec:02d},{ms:03d}'
+    with open(path, 'w') as f:
+        n = 0
+        for a, b, s in CAPTION_LINES:
+            if a >= total: continue
+            n += 1
+            f.write(f'{n}\n{ts(a)} --> {ts(min(b, total))}\n{s}\n\n')
+
 SCENES = [(s_title, 5.0), (s_copy, 7.5), (s_extract, 8.0), (s_install, 11.5),
           (s_logout, 7.0), (s_done, 8.5), (s_undo, 5.5), (s_end, 5.0)]
+if ENDCARD:
+    SCENES.append((s_repo, 4.5))
 
 def main():
     total = sum(d for _, d in SCENES)
     n = int(total * FPS)
+    PW, PH = int(W * SCALE), int(H * SCALE)
     ff = subprocess.Popen(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'bgra',
-                           '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-', '-c:v', 'libx264', '-preset', 'medium',
+                           '-s', f'{PW}x{PH}', '-r', str(FPS), '-i', '-', '-c:v', 'libx264', '-preset', 'slow',
                            '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', OUT], stdin=subprocess.PIPE)
-    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, PW, PH)
     for f in range(n):
         T = f / FPS
         acc = 0
@@ -580,6 +647,7 @@ def main():
         t = T - acc
         cr = cairo.Context(surf)
         cr.set_antialias(cairo.ANTIALIAS_BEST)
+        cr.scale(SCALE, SCALE)
         background(cr)
         # slide + zoom transition: scenes enter from the right and leave to the left
         kin = 1.0 if fn is SCENES[0][0] else ease(seg(t, 0, 0.55))
@@ -602,12 +670,14 @@ def main():
             g.add_color_stop_rgba(0.5, RING[0], RING[1], RING[2], 0.22 * math.sin(sw * math.pi))
             g.add_color_stop_rgba(1, RING[0], RING[1], RING[2], 0)
             cr.set_source(g); cr.paint()
+        if CAPTIONS:
+            draw_caption(cr, T)
         surf.flush()
         ff.stdin.write(bytes(surf.get_data()))
     ff.stdin.close(); ff.wait()
     print('frames', n, 'seconds', total)
 
 if __name__ == '__main__':
-    if len(sys.argv) > 2:  # preview stills: script out.mp4 still_dir
-        pass
+    if SRT:
+        write_srt(SRT, sum(d for _, d in SCENES))
     main()

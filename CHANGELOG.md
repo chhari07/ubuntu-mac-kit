@@ -13,6 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Sticky Notes application ID is now `io.github.chhari07.DesktopNote`.
 - Mac Bar declares support for GNOME Shell 46, 47 and 48. GNOME 46 remains the tested version.
 - The installer accepts GNOME Shell 46 to 48 without `--force-extension`.
+- README opens with a before-and-after preview animation and links the 1080p walkthrough video.
+- `make_video.py` can render 1080p with burned-in captions, a closing card and an `.srt` file.
 
 ## [1.0.0] - 2026-10-26
 

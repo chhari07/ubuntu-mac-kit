@@ -3,7 +3,7 @@
 import math, random, struct, sys, wave
 
 SR = 44100
-TOTAL = 58.0
+TOTAL = float(sys.argv[2]) if len(sys.argv) > 2 else 58.0   # 62.5 with the end card
 N = int(SR * TOTAL)
 music = [0.0] * N
 sfx = [0.0] * N
@@ -247,6 +247,11 @@ mix(sfx, 47.5 + 3.05, ding(1318.5), 0.15)
 # end
 for i in range(3): mix(sfx, 53 + 0.62 + i * 0.35, pop(500 + i * 120, 900 + i * 120), 0.25)
 mix(sfx, 53 + 2.25, chime(), 0.22)
+# end card (only when the video is long enough to include it)
+if TOTAL > 58.5:
+    mix(sfx, 58 - 0.35, whoosh(0.8, seed=580), 0.35)
+    mix(sfx, 58 + 0.1, pop(300, 700), 0.4)
+    mix(sfx, 58 + 0.6, ding(1567.98), 0.15)
 
 # ---------------- master ----------------
 with wave.open(sys.argv[1], 'wb') as w:
