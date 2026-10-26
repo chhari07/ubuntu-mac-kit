@@ -275,9 +275,11 @@ if (( WITH_ICON_LOCK )); then
   run chmod +x "$BIN/keep-mac-icons"
   place "$KIT_DIR/config/keep-mac-icons.service" "$CONF/systemd/user/keep-mac-icons.service"
   if command -v systemctl >/dev/null && run systemctl --user daemon-reload 2>/dev/null; then
-    run systemctl --user enable --now keep-mac-icons.service >/dev/null 2>&1 \
-      && ok "keep-mac-icons service enabled" \
-      || warn "Could not start keep-mac-icons. It will start on next login."
+    if run systemctl --user enable --now keep-mac-icons.service >/dev/null 2>&1; then
+      ok "keep-mac-icons service enabled"
+    else
+      warn "Could not start keep-mac-icons. It will start on next login."
+    fi
   else
     warn "systemd user session not available. The icon lock will not run."
   fi

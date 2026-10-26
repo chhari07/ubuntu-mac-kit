@@ -1,5 +1,7 @@
 # shellcheck shell=bash
 # Shared helpers for install.sh and uninstall.sh. Sourced, not executed.
+# The variables below are used by the scripts that source this file.
+# shellcheck disable=SC2034
 
 KIT_NAME="Ubuntu Mac Kit"
 KIT_VERSION="1.0.0"
