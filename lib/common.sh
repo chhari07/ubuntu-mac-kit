@@ -4,9 +4,10 @@
 # shellcheck disable=SC2034
 
 KIT_NAME="Ubuntu Mac Kit"
-KIT_VERSION="1.0.0"
+KIT_VERSION="1.1.0"
 RELEASES_URL="https://github.com/chhari07/ubuntu-mac-kit/releases/latest"
-EXT_UUID="macbar@aman.local"
+EXT_UUID="macbar@ubuntu-mac-kit"
+LEGACY_EXT_UUID="macbar@aman.local"   # extension ID used by 1.0.0
 
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
 CONF="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -54,6 +55,14 @@ has_key() {
 require_user() {
   [[ $EUID -ne 0 ]] || die "Run this as your normal user, not with sudo. Everything installs into your home folder."
   command -v gsettings >/dev/null || die "gsettings was not found. This kit needs a GNOME desktop."
+}
+
+# Print a GVariant string list with one extension ID taken out.
+without_extension() {
+  local list
+  list="$(printf '%s' "$1" | sed -e "s/, '$2'//; s/'$2', //; s/'$2'//")"
+  [[ "$list" == "[]" ]] && list="@as []"
+  printf '%s' "$list"
 }
 
 manifest_has() {

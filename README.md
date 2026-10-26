@@ -1,11 +1,12 @@
 # Ubuntu Mac Kit
 
 A portable, one-command installer for a complete macOS-style desktop on Ubuntu 24.04 (GNOME 46).
+Mac Bar also supports GNOME 47 and 48.
 Copy one archive to a new machine, run `./install.sh`, log out and back in.
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 ![Ubuntu 24.04](https://img.shields.io/badge/Ubuntu-24.04%20LTS-E95420.svg)
-![GNOME 46](https://img.shields.io/badge/GNOME%20Shell-46-4A86CF.svg)
+![GNOME 46 to 48](https://img.shields.io/badge/GNOME%20Shell-46%20to%2048-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
 ![Desktop after installation](docs/media/after.png)
@@ -50,7 +51,9 @@ Everything is installed into your home folder. `sudo` is never used and no syste
 - About 150 MB of free space
 - Optional, for Sticky Notes: `python3-gi` and `gir1.2-gtk-3.0` (installed by default on Ubuntu)
 
-Other GNOME 46 distributions should work. On other GNOME versions the theme and settings are applied, but the Mac Bar extension is skipped.
+Ubuntu 24.04 with GNOME 46 is the tested platform. Mac Bar also declares support for GNOME 47 and 48 (for example
+Ubuntu 24.10 and 25.04), which use the same panel APIs. On other versions the theme and settings are applied and
+Mac Bar is skipped unless `--force-extension` is given.
 
 ## Installation
 
@@ -85,7 +88,7 @@ sha256sum -c ubuntu-mac-kit.tar.gz.sha256
 | `--no-extension` | Skip the Mac Bar top-bar extension |
 | `--no-notes` | Skip the Sticky Notes app |
 | `--no-icon-lock` | Skip the icon-lock service |
-| `--force-extension` | Enable Mac Bar even if GNOME Shell is not version 46 |
+| `--force-extension` | Enable Mac Bar on GNOME Shell versions other than 46 to 48 |
 
 ## Uninstalling
 
@@ -123,7 +126,7 @@ ubuntu-mac-kit/
 │   ├── settings.conf           GNOME settings applied by the installer
 │   ├── keep-mac-icons          Icon-lock script
 │   └── keep-mac-icons.service  Icon-lock systemd user unit
-├── extension/macbar@aman.local Mac Bar GNOME Shell extension
+├── extension/macbar@ubuntu-mac-kit  Mac Bar GNOME Shell extension
 ├── apps/desktop-note/note.py   Sticky Notes app
 ├── assets/files-folder.svg     Files app icon
 ├── design/                     Design tokens (Figma Tokens format) and theme specification
@@ -167,7 +170,7 @@ ffmpeg -i silent.mp4 -i soundtrack.wav -c:v copy -c:a aac -shortest install-walk
 
 | Problem | Solution |
 | --- | --- |
-| Top bar is unchanged | Log out and back in. On Wayland, extensions only load at login. Check with `gnome-extensions info macbar@aman.local`. |
+| Top bar is unchanged | Log out and back in. On Wayland, extensions only load at login. Check with `gnome-extensions info macbar@ubuntu-mac-kit`. |
 | Icons switch back to Yaru | Check the icon lock: `systemctl --user status keep-mac-icons` |
 | Some apps keep the old style | Close and reopen them, or log out and back in |
 | Sticky Notes button does nothing | Install PyGObject: `sudo apt install python3-gi gir1.2-gtk-3.0` |

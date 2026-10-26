@@ -29,7 +29,7 @@ Options:
       --no-notes       Skip the Sticky Notes app used by the top-bar note button
       --no-icon-lock   Skip the service that keeps the icon theme selected
       --force-extension
-                       Enable Mac Bar even if the GNOME Shell version is not 46
+                       Enable Mac Bar on GNOME Shell versions other than 46 to 48
   -h, --help           Show this help
 
 Undo everything with ./uninstall.sh
@@ -147,8 +147,8 @@ if [[ "${XDG_CURRENT_DESKTOP:-}" != *GNOME* ]]; then
 fi
 
 SHELL_MAJOR="$(gnome-shell --version 2>/dev/null | grep -oE '[0-9]+' | head -n1 || true)"
-if (( WITH_EXTENSION )) && [[ "$SHELL_MAJOR" != 46 ]] && ! (( FORCE_EXTENSION )); then
-  warn "Mac Bar is built for GNOME Shell 46, found ${SHELL_MAJOR:-none}. It will be skipped (use --force-extension to try anyway)."
+if (( WITH_EXTENSION )) && [[ ! "$SHELL_MAJOR" =~ ^4[678]$ ]] && ! (( FORCE_EXTENSION )); then
+  warn "Mac Bar supports GNOME Shell 46 to 48, found ${SHELL_MAJOR:-none}. It will be skipped (use --force-extension to try anyway)."
   WITH_EXTENSION=0
 fi
 
@@ -225,6 +225,11 @@ section "Top bar and apps"
 if (( WITH_EXTENSION )); then
   place "$KIT_DIR/extension/$EXT_UUID" "$DATA/gnome-shell/extensions/$EXT_UUID"
   current="$(gsettings get org.gnome.shell enabled-extensions)"
+  # Upgrading from 1.0.0: turn off the extension under its old ID (its files are removed by uninstall.sh).
+  if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID" && [[ "$current" == *"'$LEGACY_EXT_UUID'"* ]]; then
+    current="$(without_extension "$current" "$LEGACY_EXT_UUID")"
+    run gsettings set org.gnome.shell enabled-extensions "$current"
+  fi
   if [[ "$current" != *"'$EXT_UUID'"* ]]; then
     if [[ "$current" == "@as []" || "$current" == "[]" ]]; then
       updated="['$EXT_UUID']"

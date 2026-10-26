@@ -1,0 +1,11 @@
+{
+  "uuid": "macbar@ubuntu-mac-kit",
+  "name": "Mac Bar",
+  "description": "Mac-style top bar: glass panel, Ubuntu logo menu, clock on the right, sticky notes button.",
+  "shell-version": [
+    "46",
+    "47",
+    "48"
+  ],
+  "url": "https://github.com/chhari07/ubuntu-mac-kit"
+}

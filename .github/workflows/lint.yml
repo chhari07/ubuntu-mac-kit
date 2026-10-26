@@ -24,4 +24,4 @@ jobs:
       - name: JSON
         run: |
           python3 -m json.tool design/theme-tokens.json > /dev/null
-          python3 -m json.tool extension/macbar@aman.local/metadata.json > /dev/null
+          python3 -m json.tool extension/macbar@ubuntu-mac-kit/metadata.json > /dev/null

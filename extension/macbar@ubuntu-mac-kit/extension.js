@@ -11,8 +11,8 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
 
-const NOTES_BUS = 'local.aman.DesktopNote';
-const NOTES_PATH = '/local/aman/DesktopNote';
+const NOTES_BUS = 'io.github.chhari07.DesktopNote';
+const NOTES_PATH = '/io/github/chhari07/DesktopNote';
 const NOTES_SCRIPT = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/desktop-note/note.py']);
 
 function run(argv) {

@@ -1,6 +1,0 @@
-{
-  "uuid": "macbar@aman.local",
-  "name": "Mac Bar",
-  "description": "Mac-style top bar: glass panel, Ubuntu logo menu, clock on the right, sticky notes button.",
-  "shell-version": ["46"]
-}

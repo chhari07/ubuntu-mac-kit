@@ -294,7 +294,7 @@ class Note(Gtk.Window):
 
 class App(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id="local.aman.DesktopNote",
+        super().__init__(application_id="io.github.chhari07.DesktopNote",
                          flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE)
         self.notes = []
         for name, fn in (("toggle", self.toggle), ("show", self.show_all),
