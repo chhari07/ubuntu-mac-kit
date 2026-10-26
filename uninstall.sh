@@ -61,7 +61,7 @@ if [[ -f "$SETTINGS_BACKUP" ]]; then
       # Only take Mac Bar out, so extensions enabled since the install stay on.
       updated="$(gsettings get org.gnome.shell enabled-extensions)"
       updated="$(without_extension "$updated" "$EXT_UUID")"
-      if [[ -d "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID" ]] && manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"; then
+      if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"; then
         updated="$(without_extension "$updated" "$LEGACY_EXT_UUID")"
       fi
       run gsettings set org.gnome.shell enabled-extensions "$updated"

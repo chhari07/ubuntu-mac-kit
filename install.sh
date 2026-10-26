@@ -225,10 +225,13 @@ section "Top bar and apps"
 if (( WITH_EXTENSION )); then
   place "$KIT_DIR/extension/$EXT_UUID" "$DATA/gnome-shell/extensions/$EXT_UUID"
   current="$(gsettings get org.gnome.shell enabled-extensions)"
-  # Upgrading from 1.0.0: turn off the extension under its old ID (its files are removed by uninstall.sh).
-  if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID" && [[ "$current" == *"'$LEGACY_EXT_UUID'"* ]]; then
-    current="$(without_extension "$current" "$LEGACY_EXT_UUID")"
-    run gsettings set org.gnome.shell enabled-extensions "$current"
+  # Upgrading from 1.0.0: remove the extension installed under its old ID.
+  if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"; then
+    run rm -rf "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"
+    if [[ "$current" == *"'$LEGACY_EXT_UUID'"* ]]; then
+      current="$(without_extension "$current" "$LEGACY_EXT_UUID")"
+      run gsettings set org.gnome.shell enabled-extensions "$current"
+    fi
   fi
   if [[ "$current" != *"'$EXT_UUID'"* ]]; then
     if [[ "$current" == "@as []" || "$current" == "[]" ]]; then

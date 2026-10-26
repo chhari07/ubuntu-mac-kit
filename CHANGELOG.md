@@ -8,8 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
-- Mac Bar extension ID is now `macbar@ubuntu-mac-kit` (was `macbar@aman.local`). Upgrading from 1.0.0 turns off the
-  old ID automatically, and `uninstall.sh` removes both.
+- Mac Bar extension ID is now `macbar@ubuntu-mac-kit` (was `macbar@aman.local`). Upgrading from 1.0.0 removes the
+  old extension automatically.
 - Sticky Notes application ID is now `io.github.chhari07.DesktopNote`.
 - Mac Bar declares support for GNOME Shell 46, 47 and 48. GNOME 46 remains the tested version.
 - The installer accepts GNOME Shell 46 to 48 without `--force-extension`.
