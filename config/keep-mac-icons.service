@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep the WhiteSur-dark icon theme selected (Ubuntu Mac Kit)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/keep-mac-icons
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

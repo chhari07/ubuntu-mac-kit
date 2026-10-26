@@ -1,0 +1,238 @@
+{
+  "aman-desktop": {
+    "color": {
+      "bg": {
+        "window": {
+          "value": "#2C2C2C",
+          "type": "color"
+        },
+        "base": {
+          "value": "#272727",
+          "type": "color"
+        },
+        "view": {
+          "value": "#181818",
+          "type": "color"
+        },
+        "unfocused": {
+          "value": "#343434",
+          "type": "color"
+        },
+        "insensitive": {
+          "value": "#2A2A2A",
+          "type": "color"
+        },
+        "switch-off": {
+          "value": "#222222",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "#181818",
+          "type": "color"
+        },
+        "strong": {
+          "value": "#4A4A4A",
+          "type": "color"
+        }
+      },
+      "fg": {
+        "primary": {
+          "value": "#F7F7F7",
+          "type": "color"
+        },
+        "text": {
+          "value": "#FFFFFF",
+          "type": "color"
+        },
+        "insensitive": {
+          "value": "#929292",
+          "type": "color"
+        },
+        "unfocused": {
+          "value": "#FFFFFFA6",
+          "type": "color"
+        }
+      },
+      "accent": {
+        "blue": {
+          "value": "#0073E5",
+          "type": "color"
+        },
+        "focus-ring": {
+          "value": "#2D97FFB3",
+          "type": "color"
+        }
+      },
+      "status": {
+        "warning": {
+          "value": "#F99B11",
+          "type": "color"
+        },
+        "error": {
+          "value": "#C7162B",
+          "type": "color"
+        },
+        "success": {
+          "value": "#109B26",
+          "type": "color"
+        }
+      },
+      "folder": {
+        "blue-top": {
+          "value": "#7FCBFA",
+          "type": "color"
+        },
+        "blue-back": {
+          "value": "#3F9CE6",
+          "type": "color"
+        }
+      },
+      "glass": {
+        "topbar": {
+          "value": "#14141A59",
+          "type": "color"
+        },
+        "dock": {
+          "value": "#2C2C2C4D",
+          "type": "color"
+        }
+      }
+    },
+    "fontFamilies": {
+      "system": {
+        "value": "Ubuntu Sans",
+        "type": "fontFamilies"
+      }
+    },
+    "typography": {
+      "display": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "700",
+          "fontSize": "34",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "title-1": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "700",
+          "fontSize": "24",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "title-2": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "600",
+          "fontSize": "20",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "headline": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "700",
+          "fontSize": "15",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "body": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "400",
+          "fontSize": "15",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "panel-bar": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "600",
+          "fontSize": "14",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      },
+      "caption": {
+        "value": {
+          "fontFamily": "Ubuntu Sans",
+          "fontWeight": "400",
+          "fontSize": "12",
+          "lineHeight": "AUTO"
+        },
+        "type": "typography"
+      }
+    },
+    "borderRadius": {
+      "small": {
+        "value": "3",
+        "type": "borderRadius"
+      },
+      "control": {
+        "value": "6",
+        "type": "borderRadius"
+      },
+      "card": {
+        "value": "12",
+        "type": "borderRadius"
+      },
+      "switch": {
+        "value": "14",
+        "type": "borderRadius"
+      },
+      "dock": {
+        "value": "18",
+        "type": "borderRadius"
+      },
+      "pill": {
+        "value": "9999",
+        "type": "borderRadius"
+      }
+    },
+    "sizing": {
+      "control-height": {
+        "value": "34",
+        "type": "sizing"
+      },
+      "topbar-height": {
+        "value": "30",
+        "type": "sizing"
+      },
+      "dock-icon": {
+        "value": "48",
+        "type": "sizing"
+      }
+    },
+    "boxShadow": {
+      "window": {
+        "value": {
+          "x": "0",
+          "y": "8",
+          "blur": "24",
+          "spread": "0",
+          "color": "#00000059",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow"
+      }
+    },
+    "blur": {
+      "topbar": {
+        "value": "40",
+        "type": "other"
+      },
+      "dock": {
+        "value": "40",
+        "type": "other"
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck -x install.sh uninstall.sh lib/common.sh tools/build-bundle.sh
+          shellcheck -s sh config/keep-mac-icons
+
+      - name: Python syntax
+        run: python3 -m py_compile apps/desktop-note/note.py tools/*.py
+
+      - name: JSON
+        run: |
+          python3 -m json.tool design/theme-tokens.json > /dev/null
+          python3 -m json.tool extension/macbar@aman.local/metadata.json > /dev/null

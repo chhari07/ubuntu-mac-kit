@@ -1,0 +1,9 @@
+#!/bin/sh
+# Keeps the WhiteSur-dark icon theme selected.
+# Ubuntu Settings > Appearance resets the icon theme to Yaru whenever a style or accent colour is picked.
+# Installed by Ubuntu Mac Kit. Turn off with: systemctl --user disable --now keep-mac-icons
+THEME=WhiteSur-dark
+KEY="org.gnome.desktop.interface icon-theme"
+fix() { [ "$(gsettings get $KEY)" = "'$THEME'" ] || gsettings set $KEY "$THEME"; }
+fix
+gsettings monitor $KEY | while read -r _; do fix; done

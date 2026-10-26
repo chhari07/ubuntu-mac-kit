@@ -1,0 +1,13 @@
+#panel.macbar-panel {
+  background-color: rgba(20, 20, 26, 0.35);
+}
+#panel.macbar-panel .panel-button {
+  font-weight: 600;
+}
+.macbar-logo {
+  icon-size: 16px;
+  padding: 0 6px;
+}
+.macbar-sticky {
+  icon-size: 16px;
+}
