@@ -211,8 +211,10 @@ done < "$KIT_DIR/config/settings.conf"
 ok "Theme, cursor, dark mode, window buttons and dock applied"
 
 if [[ -n "$WALLPAPER" ]]; then
-  ext="${WALLPAPER##*.}"
-  dst="$DATA/backgrounds/ubuntu-mac-kit/wallpaper.${ext,,}"
+  name="$(basename "$WALLPAPER")"
+  ext=""
+  [[ "$name" == *.* ]] && ext=".${name##*.}"
+  dst="$DATA/backgrounds/ubuntu-mac-kit/wallpaper${ext,,}"
   place "$WALLPAPER" "$dst"
   apply_setting org.gnome.desktop.background picture-uri "'file://$dst'"
   apply_setting org.gnome.desktop.background picture-uri-dark "'file://$dst'"
