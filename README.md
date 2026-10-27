@@ -4,18 +4,18 @@ A portable, one-command installer for a complete macOS-style desktop on Ubuntu 2
 Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
-![Ubuntu 24.04](https://img.shields.io/badge/Ubuntu-24.04%20LTS-E95420.svg)
+![Ubuntu 24.04 and newer](https://img.shields.io/badge/Ubuntu-24.04%20and%20newer-E95420.svg)
 ![GNOME 46 to 51](https://img.shields.io/badge/GNOME%20Shell-46%20to%2051-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
 ![A Mac-style desktop on Ubuntu, made with Ubuntu Mac Kit](docs/media/poster.jpg)
 
+The wallpaper is not included. Set your own with `./install.sh --wallpaper FILE`.
+
 ![Before and after installation](docs/media/preview.gif)
 
 **[Watch the full install walkthrough](https://github.com/chhari07/ubuntu-mac-kit/releases/download/v1.1.0/ubuntu-mac-kit-walkthrough-1080p.mp4)**
 (1080p, 62 seconds, with captions and sound)
-
-![Desktop after installation](docs/media/after.png)
 
 ## Contents
 
