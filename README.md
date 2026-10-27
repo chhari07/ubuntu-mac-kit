@@ -8,6 +8,8 @@ Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 ![GNOME 46 to 51](https://img.shields.io/badge/GNOME%20Shell-46%20to%2051-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
+![A Mac-style desktop on Ubuntu, made with Ubuntu Mac Kit](docs/media/poster.jpg)
+
 ![Before and after installation](docs/media/preview.gif)
 
 **[Watch the full install walkthrough](https://github.com/chhari07/ubuntu-mac-kit/releases/download/v1.1.0/ubuntu-mac-kit-walkthrough-1080p.mp4)**
