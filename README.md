@@ -1,6 +1,6 @@
 # Ubuntu Mac Kit
 
-A portable, one-command installer for a complete macOS-style desktop on Ubuntu 24.04 (GNOME 46).
+A portable, one-command installer for a complete macOS-style desktop on Ubuntu 24.04 and newer (GNOME Shell 46 to 51).
 Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
@@ -37,7 +37,7 @@ Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 | Cursor | macOS cursor theme (apple_cursor) |
 | GTK styling | Yaru-blue-dark for GTK 3, MacTahoe styling for GTK 4 / libadwaita apps, dark mode |
 | Window controls | Close, minimize and maximize on the left |
-| Mac Bar | GNOME Shell extension: translucent blurred top bar, Ubuntu logo menu, clock on the right, sticky-notes button |
+| Mac Bar | GNOME Shell extension: translucent blurred top bar, Ubuntu logo menu, clock on the right, sticky-notes button (left click toggles the notes; on GNOME 50 and newer, right click opens its menu) |
 | Dock | Glass dock along the bottom, 30% opacity, 48 px icons |
 | Sticky Notes | Transparent desktop notes, toggled from the top bar |
 | Files icon | Blue macOS folder for the Files app in the dock |
@@ -47,7 +47,7 @@ Everything is installed into your home folder. `sudo` is never used and no syste
 
 ## Requirements
 
-- Ubuntu 24.04 LTS with the default GNOME Shell 46 session (Wayland or X11)
+- Ubuntu 24.04 LTS or newer with the default GNOME Shell session, version 46 to 51 (Wayland or X11)
 - About 150 MB of free space
 - Optional, for Sticky Notes: `python3-gi` and `gir1.2-gtk-3.0` (installed by default on Ubuntu)
 
@@ -60,6 +60,17 @@ unless `--force-extension` is given. Reports from GNOME 49 to 51 are welcome.
 
 1. Download `ubuntu-mac-kit.tar.gz` from the [latest release](https://github.com/chhari07/ubuntu-mac-kit/releases/latest).
    The release bundle includes the theme files. A plain clone of this repository does not.
+
+   > **GNOME 49 to 51:** release 1.1.0 supports Mac Bar on GNOME 46 to 48 only. Support for 49 to 51 is on the `main`
+   > branch and will ship in the next release. Until then, copy `main` over the extracted bundle before running the
+   > installer:
+   >
+   > ```bash
+   > tar -xzf ubuntu-mac-kit.tar.gz
+   > git clone --depth 1 https://github.com/chhari07/ubuntu-mac-kit.git ubuntu-mac-kit-main
+   > cp -r ubuntu-mac-kit-main/. ubuntu-mac-kit/
+   > rm -rf ubuntu-mac-kit/.git
+   > ```
 
 2. Extract it and run the installer:
 
@@ -177,6 +188,7 @@ Without flags, `make_video.py` renders the 720p version in `docs/media/install-w
 | Top bar is unchanged | Log out and back in. On Wayland, extensions only load at login. Check with `gnome-extensions info macbar@ubuntu-mac-kit`. |
 | Icons switch back to Yaru | Check the icon lock: `systemctl --user status keep-mac-icons` |
 | Some apps keep the old style | Close and reopen them, or log out and back in |
+| Sticky Notes menu does not open (GNOME 50 and newer) | Right-click the sticky-notes button. Left click toggles the notes. |
 | Sticky Notes button does nothing | Install PyGObject: `sudo apt install python3-gi gir1.2-gtk-3.0` |
 | Files icon reverted after an update | Run `./install.sh` again |
 
