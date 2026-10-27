@@ -10,11 +10,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - Sticky notes button on GNOME 50 and newer: left click now toggles the notes without also opening the menu.
   GNOME 50 replaced the top-bar button event handler with a click gesture; the menu now opens on right click there.
+- `--wallpaper` with a file name that has no extension. The extension was taken from the whole path, so `./wall`
+  was saved as `wallpaper./wall`.
 
 ### Changed
 
 - Mac Bar declares support for GNOME Shell 46 to 51. Its code was checked against the GNOME Shell 51.1 sources.
 - The installer accepts GNOME Shell 46 to 51 without `--force-extension` and compares the version as a number.
+- README opens with a screenshot of the finished desktop, notes that the wallpaper is not included, and explains how
+  to install on GNOME 49 to 51 before the next release.
+
+### Removed
+
+- Unused screenshots `after.png`, `copy.png` and `installer.png` from `docs/media/`.
 
 ## [1.1.0] - 2026-10-26
 
