@@ -75,11 +75,23 @@ class StickyButton extends PanelMenu.Button {
         }));
         this.menu.addAction('Show / Hide All Notes', () => notesAction('toggle'));
         this.menu.addAction('New Note', () => notesAction('new'));
+
+        // GNOME 50+ opens the menu from a click gesture, which ignores vfunc_event,
+        // so keep that gesture for right click and add one for left click.
+        if (this._clickGesture) {
+            this._clickGesture.set_required_button(Clutter.BUTTON_SECONDARY);
+            const toggle = new Clutter.ClickGesture();
+            toggle.set_required_button(Clutter.BUTTON_PRIMARY);
+            toggle.connect('recognize', () => notesAction('toggle'));
+            this.add_action(toggle);
+        }
     }
 
     // Left click toggles the notes straight away; right click opens the menu.
+    // GNOME 46 to 49 only, see the gestures above for newer versions.
     vfunc_event(event) {
-        if (event.type() === Clutter.EventType.BUTTON_PRESS && event.get_button() === 1) {
+        if (!this._clickGesture &&
+            event.type() === Clutter.EventType.BUTTON_PRESS && event.get_button() === 1) {
             notesAction('toggle');
             return Clutter.EVENT_STOP;
         }

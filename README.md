@@ -5,7 +5,7 @@ Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 ![Ubuntu 24.04](https://img.shields.io/badge/Ubuntu-24.04%20LTS-E95420.svg)
-![GNOME 46 to 48](https://img.shields.io/badge/GNOME%20Shell-46%20to%2048-4A86CF.svg)
+![GNOME 46 to 51](https://img.shields.io/badge/GNOME%20Shell-46%20to%2051-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
 ![Before and after installation](docs/media/preview.gif)
@@ -51,9 +51,10 @@ Everything is installed into your home folder. `sudo` is never used and no syste
 - About 150 MB of free space
 - Optional, for Sticky Notes: `python3-gi` and `gir1.2-gtk-3.0` (installed by default on Ubuntu)
 
-Ubuntu 24.04 with GNOME 46 is the tested platform. Mac Bar also declares support for GNOME 47 and 48 (for example
-Ubuntu 24.10 and 25.04), which use the same panel APIs. On other versions the theme and settings are applied and
-Mac Bar is skipped unless `--force-extension` is given.
+Ubuntu 24.04 with GNOME 46 is the tested platform. Mac Bar also declares support for GNOME 47 to 51 (Ubuntu 24.10
+to 26.10). Its code was checked against the GNOME Shell 51.1 sources; GNOME 50 changed how top-bar buttons handle
+clicks, and Mac Bar handles both ways. On other versions the theme and settings are applied and Mac Bar is skipped
+unless `--force-extension` is given. Reports from GNOME 49 to 51 are welcome.
 
 ## Installation
 
@@ -88,7 +89,7 @@ sha256sum -c ubuntu-mac-kit.tar.gz.sha256
 | `--no-extension` | Skip the Mac Bar top-bar extension |
 | `--no-notes` | Skip the Sticky Notes app |
 | `--no-icon-lock` | Skip the icon-lock service |
-| `--force-extension` | Enable Mac Bar on GNOME Shell versions other than 46 to 48 |
+| `--force-extension` | Enable Mac Bar on GNOME Shell versions other than 46 to 51 |
 
 ## Uninstalling
 

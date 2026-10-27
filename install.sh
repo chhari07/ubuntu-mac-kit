@@ -29,7 +29,7 @@ Options:
       --no-notes       Skip the Sticky Notes app used by the top-bar note button
       --no-icon-lock   Skip the service that keeps the icon theme selected
       --force-extension
-                       Enable Mac Bar on GNOME Shell versions other than 46 to 48
+                       Enable Mac Bar on GNOME Shell versions other than 46 to 51
   -h, --help           Show this help
 
 Undo everything with ./uninstall.sh
@@ -147,8 +147,8 @@ if [[ "${XDG_CURRENT_DESKTOP:-}" != *GNOME* ]]; then
 fi
 
 SHELL_MAJOR="$(gnome-shell --version 2>/dev/null | grep -oE '[0-9]+' | head -n1 || true)"
-if (( WITH_EXTENSION )) && [[ ! "$SHELL_MAJOR" =~ ^4[678]$ ]] && ! (( FORCE_EXTENSION )); then
-  warn "Mac Bar supports GNOME Shell 46 to 48, found ${SHELL_MAJOR:-none}. It will be skipped (use --force-extension to try anyway)."
+if (( WITH_EXTENSION )) && ! { [[ "$SHELL_MAJOR" =~ ^[0-9]+$ ]] && (( SHELL_MAJOR >= 46 && SHELL_MAJOR <= 51 )); } && ! (( FORCE_EXTENSION )); then
+  warn "Mac Bar supports GNOME Shell 46 to 51, found ${SHELL_MAJOR:-none}. It will be skipped (use --force-extension to try anyway)."
   WITH_EXTENSION=0
 fi
 

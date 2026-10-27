@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- Sticky notes button on GNOME 50 and newer: left click now toggles the notes without also opening the menu.
+  GNOME 50 replaced the top-bar button event handler with a click gesture; the menu now opens on right click there.
+
+### Changed
+
+- Mac Bar declares support for GNOME Shell 46 to 51. Its code was checked against the GNOME Shell 51.1 sources.
+- The installer accepts GNOME Shell 46 to 51 without `--force-extension` and compares the version as a number.
+
 ## [1.1.0] - 2026-10-26
 
 ### Changed
