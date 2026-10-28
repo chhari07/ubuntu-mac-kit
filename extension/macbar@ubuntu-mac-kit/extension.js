@@ -11,9 +11,14 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as SystemActions from 'resource:///org/gnome/shell/misc/systemActions.js';
 
+import {DockMagnifier} from './dock.js';
+
 const NOTES_BUS = 'io.github.chhari07.DesktopNote';
 const NOTES_PATH = '/io/github/chhari07/DesktopNote';
 const NOTES_SCRIPT = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/desktop-note/note.py']);
+const GITHUB_BUS = 'io.github.chhari07.GitHubWidget';
+const GITHUB_PATH = '/io/github/chhari07/GitHubWidget';
+const GITHUB_SCRIPT = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/github-widget/widget.py']);
 
 function run(argv) {
     try {
@@ -23,18 +28,21 @@ function run(argv) {
     }
 }
 
-// Ask the running notes app to do something; start it if it is not running.
-function notesAction(name) {
-    Gio.DBus.session.call(NOTES_BUS, NOTES_PATH, 'org.gtk.Actions', 'Activate',
+// Ask a running helper app to do something; start it if it is not running.
+function appAction(bus, path, script, name) {
+    Gio.DBus.session.call(bus, path, 'org.gtk.Actions', 'Activate',
         new GLib.Variant('(sava{sv})', [name, [], {}]), null,
         Gio.DBusCallFlags.NO_AUTO_START, 1000, null, (conn, res) => {
             try {
                 conn.call_finish(res);
             } catch (e) {
-                run(['env', 'GDK_BACKEND=x11', 'python3', NOTES_SCRIPT, `--${name === 'toggle' ? 'show' : name}`]);
+                run(['env', 'GDK_BACKEND=x11', 'python3', script, `--${name === 'toggle' ? 'show' : name}`]);
             }
         });
 }
+
+const notesAction = name => appAction(NOTES_BUS, NOTES_PATH, NOTES_SCRIPT, name);
+const githubAction = name => appAction(GITHUB_BUS, GITHUB_PATH, GITHUB_SCRIPT, name);
 
 const LogoMenu = GObject.registerClass(
 class LogoMenu extends PanelMenu.Button {
@@ -65,16 +73,18 @@ class LogoMenu extends PanelMenu.Button {
     }
 });
 
-const StickyButton = GObject.registerClass(
-class StickyButton extends PanelMenu.Button {
-    _init(dir) {
-        super._init(0.5, 'Sticky Notes');
+// Top-bar button for a helper app: left click toggles it, right click opens a menu.
+const ToggleButton = GObject.registerClass(
+class ToggleButton extends PanelMenu.Button {
+    _init(name, icon, action, items) {
+        super._init(0.5, name);
+        this._action = action;
         this.add_child(new St.Icon({
-            gicon: Gio.icon_new_for_string(`${dir}/icons/sticky-note.svg`),
+            gicon: Gio.icon_new_for_string(icon),
             style_class: 'system-status-icon macbar-sticky',
         }));
-        this.menu.addAction('Show / Hide All Notes', () => notesAction('toggle'));
-        this.menu.addAction('New Note', () => notesAction('new'));
+        for (const [label, fn] of items)
+            this.menu.addAction(label, fn);
 
         // GNOME 50+ opens the menu from a click gesture, which ignores vfunc_event,
         // so keep that gesture for right click and add one for left click.
@@ -82,17 +92,17 @@ class StickyButton extends PanelMenu.Button {
             this._clickGesture.set_required_button(Clutter.BUTTON_SECONDARY);
             const toggle = new Clutter.ClickGesture();
             toggle.set_required_button(Clutter.BUTTON_PRIMARY);
-            toggle.connect('recognize', () => notesAction('toggle'));
+            toggle.connect('recognize', () => this._action('toggle'));
             this.add_action(toggle);
         }
     }
 
-    // Left click toggles the notes straight away; right click opens the menu.
+    // Left click toggles the app straight away; right click opens the menu.
     // GNOME 46 to 49 only, see the gestures above for newer versions.
     vfunc_event(event) {
         if (!this._clickGesture &&
             event.type() === Clutter.EventType.BUTTON_PRESS && event.get_button() === 1) {
-            notesAction('toggle');
+            this._action('toggle');
             return Clutter.EVENT_STOP;
         }
         return super.vfunc_event(event);
@@ -117,17 +127,39 @@ export default class MacBar extends Extension {
         this._logo = new LogoMenu(this.path);
         panel.addToStatusArea('macbar-logo', this._logo, 0, 'left');
 
-        this._sticky = new StickyButton(this.path);
+        this._sticky = new ToggleButton('Sticky Notes', `${this.path}/icons/sticky-note.svg`, notesAction, [
+            ['Show / Hide All Notes', () => notesAction('toggle')],
+            ['New Note', () => notesAction('new')],
+        ]);
         panel.addToStatusArea('macbar-sticky', this._sticky, 0, 'right');
+
+        // The GitHub widget is optional, so only show its button when it is installed.
+        if (GLib.file_test(GITHUB_SCRIPT, GLib.FileTest.EXISTS)) {
+            this._github = new ToggleButton('GitHub Widget', `${this.path}/icons/github-mark.svg`, githubAction, [
+                ['Show / Hide GitHub Widget', () => githubAction('toggle')],
+                ['Refresh Now', () => githubAction('refresh')],
+            ]);
+            panel.addToStatusArea('macbar-github', this._github, 0, 'right');
+        }
 
         // Clock on the right, like macOS
         const clock = panel.statusArea.dateMenu.container;
         this._clockParent = clock.get_parent();
         this._clockParent.remove_child(clock);
         panel._rightBox.add_child(clock);
+
+        // Mac-style magnify and launch bounce on the Ubuntu dock
+        try {
+            this._dock = new DockMagnifier();
+        } catch (e) {
+            logError(e, 'macbar: dock magnifier');
+        }
     }
 
     disable() {
+        this._dock?.destroy();
+        this._dock = null;
+
         const panel = Main.panel;
         const clock = panel.statusArea.dateMenu.container;
         clock.get_parent()?.remove_child(clock);
@@ -135,7 +167,8 @@ export default class MacBar extends Extension {
 
         this._logo?.destroy();
         this._sticky?.destroy();
-        this._logo = this._sticky = null;
+        this._github?.destroy();
+        this._logo = this._sticky = this._github = null;
 
         this._activities?.show();
         this._activities = null;

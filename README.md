@@ -40,8 +40,10 @@ The wallpaper is not included. Set your own with `./install.sh --wallpaper FILE`
 | GTK styling | Yaru-blue-dark for GTK 3, MacTahoe styling for GTK 4 / libadwaita apps, dark mode |
 | Window controls | Close, minimize and maximize on the left |
 | Mac Bar | GNOME Shell extension: translucent blurred top bar, Ubuntu logo menu, clock on the right, sticky-notes button (left click toggles the notes; on GNOME 50 and newer, right click opens its menu) |
-| Dock | Glass dock along the bottom, 30% opacity, 48 px icons |
+| Dock | Glass dock along the bottom, 30% opacity, 48 px icons. Mac Bar adds macOS-style magnification on hover and a bounce when an app starts |
 | Sticky Notes | Transparent desktop notes, toggled from the top bar |
+| Desktop Stack | Optional (`--desktop-stack`). The photos and PDFs on your desktop shown as one scattered pile of thumbnails |
+| GitHub widget | Optional (`--github-user NAME`). Glass card with a GitHub contribution graph, toggled from the top bar |
 | Files icon | Blue macOS folder for the Files app in the dock |
 | Icon lock | A small user service that keeps the icon theme selected when Ubuntu Settings tries to reset it |
 
@@ -51,7 +53,8 @@ Everything is installed into your home folder. `sudo` is never used and no syste
 
 - Ubuntu 24.04 LTS or newer with the default GNOME Shell session, version 46 to 51 (Wayland or X11)
 - About 150 MB of free space
-- Optional, for Sticky Notes: `python3-gi` and `gir1.2-gtk-3.0` (installed by default on Ubuntu)
+- Optional, for Sticky Notes and the GitHub widget: `python3-gi` and `gir1.2-gtk-3.0` (installed by default on Ubuntu)
+- Optional, for PDF thumbnails in Desktop Stack: `poppler-utils` (installed by default on Ubuntu)
 
 Ubuntu 24.04 with GNOME 46 is the tested platform. Mac Bar also declares support for GNOME 47 to 51 (Ubuntu 24.10
 to 26.10). Its code was checked against the GNOME Shell 51.1 sources; GNOME 50 changed how top-bar buttons handle
@@ -102,6 +105,8 @@ sha256sum -c ubuntu-mac-kit.tar.gz.sha256
 | `--no-extension` | Skip the Mac Bar top-bar extension |
 | `--no-notes` | Skip the Sticky Notes app |
 | `--no-icon-lock` | Skip the icon-lock service |
+| `--desktop-stack` | Also add the Desktop Stack extension |
+| `--github-user NAME` | Also add the GitHub widget, showing the public contribution graph of `NAME` |
 | `--force-extension` | Enable Mac Bar on GNOME Shell versions other than 46 to 51 |
 
 ## Uninstalling
@@ -121,8 +126,15 @@ removes the files the kit added and puts back any files it replaced. Log out and
   `~/.local/share/ubuntu-mac-kit/backup/`. Running the installer again does not overwrite these originals.
 - **Manifest.** Every path the kit creates or replaces is listed in `~/.local/share/ubuntu-mac-kit/manifest`.
   The uninstaller works through this list in reverse.
-- **Extensions.** Mac Bar is appended to `enabled-extensions`. On uninstall only Mac Bar is removed from that list,
-  so extensions you enabled later stay on.
+- **Extensions.** Mac Bar and Desktop Stack are appended to `enabled-extensions`. On uninstall only the kit's
+  extensions are removed from that list, so extensions you enabled later stay on.
+- **Desktop Stack.** The 24 newest images and PDFs in `~/Desktop` form the pile. They are hidden from the desktop icon
+  grid through `~/Desktop/.hidden`; turning the extension off removes exactly the entries it added. Double-click a
+  thumbnail to open the file, drag a thumbnail or the label to move it, right-click the label to tidy the pile, and
+  click the label to open the Desktop folder. Files dropped on the pile are moved to the desktop.
+- **GitHub widget.** Reads the public contribution calendar at `github.com/users/NAME/contributions`, so no token is
+  needed. It refreshes every hour, when the day changes and after the computer wakes. The user name is stored in
+  `~/.config/github-widget/config.json`.
 - **Icon lock.** Ubuntu Settings > Appearance switches the icon theme back to Yaru when a style or accent colour is
   selected. The `keep-mac-icons` user service watches that setting and restores WhiteSur-dark. Disable it with
   `systemctl --user disable --now keep-mac-icons`.
@@ -140,8 +152,12 @@ ubuntu-mac-kit/
 │   ├── settings.conf           GNOME settings applied by the installer
 │   ├── keep-mac-icons          Icon-lock script
 │   └── keep-mac-icons.service  Icon-lock systemd user unit
-├── extension/macbar@ubuntu-mac-kit  Mac Bar GNOME Shell extension
-├── apps/desktop-note/note.py   Sticky Notes app
+├── extension/
+│   ├── macbar@ubuntu-mac-kit         Mac Bar GNOME Shell extension (top bar and dock magnification)
+│   └── desktop-stack@ubuntu-mac-kit  Desktop Stack GNOME Shell extension
+├── apps/
+│   ├── desktop-note/note.py    Sticky Notes app
+│   └── github-widget/widget.py GitHub contribution widget
 ├── assets/files-folder.svg     Files app icon
 ├── design/                     Design tokens (Figma Tokens format) and theme specification
 ├── docs/media/                 Screenshots, preview animation and walkthrough video
@@ -192,6 +208,9 @@ Without flags, `make_video.py` renders the 720p version in `docs/media/install-w
 | Some apps keep the old style | Close and reopen them, or log out and back in |
 | Sticky Notes menu does not open (GNOME 50 and newer) | Right-click the sticky-notes button. Left click toggles the notes. |
 | Sticky Notes button does nothing | Install PyGObject: `sudo apt install python3-gi gir1.2-gtk-3.0` |
+| Dock icons do not magnify | Magnification works with the Ubuntu Dock (dash-to-dock). Log out and back in after installing. |
+| Desktop Stack shows no PDFs | Install `poppler-utils`, which provides `pdftoppm` |
+| GitHub widget shows an error | Check the user name in `~/.config/github-widget/config.json` and your network connection |
 | Files icon reverted after an update | Run `./install.sh` again |
 
 ## Credits

@@ -58,9 +58,10 @@ if [[ -f "$SETTINGS_BACKUP" ]]; then
     [[ -z "$schema" ]] && continue
     has_key "$schema" "$key" || continue
     if [[ "$schema $key" == "org.gnome.shell enabled-extensions" ]]; then
-      # Only take Mac Bar out, so extensions enabled since the install stay on.
+      # Only take the kit's extensions out, so extensions enabled since the install stay on.
       updated="$(gsettings get org.gnome.shell enabled-extensions)"
       updated="$(without_extension "$updated" "$EXT_UUID")"
+      updated="$(without_extension "$updated" "$STACK_UUID")"
       if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"; then
         updated="$(without_extension "$updated" "$LEGACY_EXT_UUID")"
       fi
@@ -87,7 +88,7 @@ if [[ -f "$MANIFEST" ]]; then
     fi
   done
   run rmdir --ignore-fail-on-non-empty "$DATA/icons/ubuntu-mac-kit" "$DATA/desktop-note" \
-    "$DATA/backgrounds/ubuntu-mac-kit" 2>/dev/null || true
+    "$DATA/github-widget" "$CONF/github-widget" "$DATA/backgrounds/ubuntu-mac-kit" 2>/dev/null || true
   if command -v systemctl >/dev/null; then
     run systemctl --user daemon-reload 2>/dev/null || true
   fi

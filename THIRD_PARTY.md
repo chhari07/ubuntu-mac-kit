@@ -19,4 +19,5 @@ All of them are licensed under the GNU General Public License v3.0. A copy of th
 ## Trademarks
 
 macOS is a trademark of Apple Inc. Ubuntu and the Ubuntu logo are trademarks of Canonical Ltd.
-This project is not affiliated with or endorsed by either company.
+GitHub and the GitHub mark (`github-mark.svg`, used by the optional GitHub widget) are trademarks of GitHub, Inc.
+This project is not affiliated with or endorsed by any of these companies.

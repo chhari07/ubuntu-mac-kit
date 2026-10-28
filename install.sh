@@ -12,6 +12,8 @@ source "$KIT_DIR/lib/common.sh"
 WITH_ICON_LOCK=1
 WITH_EXTENSION=1
 WITH_NOTES=1
+WITH_STACK=0
+GITHUB_USER=""
 FORCE_EXTENSION=0
 WALLPAPER=""
 
@@ -28,6 +30,10 @@ Options:
       --no-extension   Skip the Mac Bar top-bar extension
       --no-notes       Skip the Sticky Notes app used by the top-bar note button
       --no-icon-lock   Skip the service that keeps the icon theme selected
+      --desktop-stack  Also add Desktop Stack: the photos and PDFs on your desktop
+                       shown as one pile of thumbnails (hidden from the icon grid)
+      --github-user NAME
+                       Also add a desktop widget with NAME's GitHub contribution graph
       --force-extension
                        Enable Mac Bar on GNOME Shell versions other than 46 to 51
   -h, --help           Show this help
@@ -44,6 +50,8 @@ while [[ $# -gt 0 ]]; do
     --no-extension) WITH_EXTENSION=0 ;;
     --no-notes) WITH_NOTES=0 ;;
     --no-icon-lock) WITH_ICON_LOCK=0 ;;
+    --desktop-stack) WITH_STACK=1 ;;
+    --github-user) [[ $# -ge 2 && -n "$2" ]] || die "--github-user needs a GitHub user name"; GITHUB_USER="$2"; shift ;;
     --force-extension) FORCE_EXTENSION=1 ;;
     -h|--help) usage; exit 0 ;;
     *) usage >&2; die "Unknown option: $1" ;;
@@ -133,6 +141,35 @@ apply_setting() {
   run gsettings set "$schema" "$key" "$value"
 }
 
+# Copy the extension $1 into place and add it to the enabled extensions.
+enable_extension() {
+  local uuid="$1" current updated
+  place "$KIT_DIR/extension/$uuid" "$DATA/gnome-shell/extensions/$uuid"
+  current="$(gsettings get org.gnome.shell enabled-extensions)"
+  if [[ "$current" != *"'$uuid'"* ]]; then
+    if [[ "$current" == "@as []" || "$current" == "[]" ]]; then
+      updated="['$uuid']"
+    else
+      updated="${current%]}, '$uuid']"
+    fi
+    apply_setting org.gnome.shell enabled-extensions "$updated"
+  fi
+}
+
+# Write an autostart entry that starts a helper app hidden at login.
+autostart() {
+  local id="$1" name="$2" comment="$3" script="$4"
+  write_file "$CONF/autostart/$id.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=$name
+Comment=$comment
+Exec=env GDK_BACKEND=x11 python3 $script --background
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+EOF
+}
+
 # ---------------------------------------------------------------------------
 # Pre-flight checks
 
@@ -151,6 +188,14 @@ if (( WITH_EXTENSION )) && ! { [[ "$SHELL_MAJOR" =~ ^[0-9]+$ ]] && (( SHELL_MAJO
   warn "Mac Bar supports GNOME Shell 46 to 51, found ${SHELL_MAJOR:-none}. It will be skipped (use --force-extension to try anyway)."
   WITH_EXTENSION=0
 fi
+if (( WITH_STACK && ! WITH_EXTENSION )); then
+  warn "Desktop Stack needs the same GNOME Shell support as Mac Bar. It will be skipped."
+  WITH_STACK=0
+fi
+
+if [[ -n "$GITHUB_USER" && ! "$GITHUB_USER" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ ]]; then
+  die "Not a valid GitHub user name: $GITHUB_USER"
+fi
 
 if [[ -n "$WALLPAPER" && ! -f "$WALLPAPER" ]]; then
   die "Wallpaper file not found: $WALLPAPER"
@@ -161,8 +206,10 @@ echo "This will install into $HOME:"
 echo "  - WhiteSur-dark icons with macOS folders and file icons, macOS cursor"
 echo "  - MacTahoe styling for GTK4 apps, dark mode, window buttons on the left"
 echo "  - Glass dock settings (bottom, 48 px icons)"
-(( WITH_EXTENSION )) && echo "  - Mac Bar top-bar extension"
+(( WITH_EXTENSION )) && echo "  - Mac Bar top-bar extension with dock magnification"
+(( WITH_STACK )) && echo "  - Desktop Stack extension"
 (( WITH_NOTES )) && echo "  - Sticky Notes app"
+[[ -n "$GITHUB_USER" ]] && echo "  - GitHub widget for $GITHUB_USER"
 (( WITH_ICON_LOCK )) && echo "  - Icon-lock service (keeps the icon theme selected)"
 [[ -n "$WALLPAPER" ]] && echo "  - Wallpaper: $WALLPAPER"
 echo
@@ -225,47 +272,49 @@ fi
 section "Top bar and apps"
 
 if (( WITH_EXTENSION )); then
-  place "$KIT_DIR/extension/$EXT_UUID" "$DATA/gnome-shell/extensions/$EXT_UUID"
-  current="$(gsettings get org.gnome.shell enabled-extensions)"
   # Upgrading from 1.0.0: remove the extension installed under its old ID.
   if manifest_has "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"; then
     run rm -rf "$DATA/gnome-shell/extensions/$LEGACY_EXT_UUID"
+    current="$(gsettings get org.gnome.shell enabled-extensions)"
     if [[ "$current" == *"'$LEGACY_EXT_UUID'"* ]]; then
-      current="$(without_extension "$current" "$LEGACY_EXT_UUID")"
-      run gsettings set org.gnome.shell enabled-extensions "$current"
+      run gsettings set org.gnome.shell enabled-extensions "$(without_extension "$current" "$LEGACY_EXT_UUID")"
     fi
   fi
-  if [[ "$current" != *"'$EXT_UUID'"* ]]; then
-    if [[ "$current" == "@as []" || "$current" == "[]" ]]; then
-      updated="['$EXT_UUID']"
-    else
-      updated="${current%]}, '$EXT_UUID']"
-    fi
-    apply_setting org.gnome.shell enabled-extensions "$updated"
-  fi
+  enable_extension "$EXT_UUID"
   apply_setting org.gnome.shell disable-user-extensions false
   ok "Mac Bar extension installed and enabled"
 else
   skip "Mac Bar extension"
 fi
 
+if (( WITH_STACK )); then
+  enable_extension "$STACK_UUID"
+  command -v pdftoppm >/dev/null || warn "Desktop Stack needs pdftoppm for PDF thumbnails: sudo apt install poppler-utils"
+  ok "Desktop Stack extension installed and enabled"
+else
+  skip "Desktop Stack extension (add it with --desktop-stack)"
+fi
+
 if (( WITH_NOTES )); then
   place "$KIT_DIR/apps/desktop-note/note.py" "$DATA/desktop-note/note.py"
-  write_file "$CONF/autostart/desktop-note.desktop" <<EOF
-[Desktop Entry]
-Type=Application
-Name=Desktop Note
-Comment=Transparent sticky notes on the desktop
-Exec=env GDK_BACKEND=x11 python3 $DATA/desktop-note/note.py --background
-X-GNOME-Autostart-enabled=true
-NoDisplay=true
-EOF
+  autostart desktop-note "Desktop Note" "Transparent sticky notes on the desktop" "$DATA/desktop-note/note.py"
   if ! python3 -c 'import gi; gi.require_version("Gtk", "3.0")' 2>/dev/null; then
     warn "Sticky Notes needs PyGObject: sudo apt install python3-gi gir1.2-gtk-3.0"
   fi
   ok "Sticky Notes app"
 else
   skip "Sticky Notes app"
+fi
+
+if [[ -n "$GITHUB_USER" ]]; then
+  for item in widget.py github-mark.svg; do
+    place "$KIT_DIR/apps/github-widget/$item" "$DATA/github-widget/$item"
+  done
+  printf '{"user": "%s"}\n' "$GITHUB_USER" | write_file "$CONF/github-widget/config.json"
+  autostart github-widget "GitHub Widget" "GitHub contribution graph on the desktop" "$DATA/github-widget/widget.py"
+  ok "GitHub widget for $GITHUB_USER"
+else
+  skip "GitHub widget (add it with --github-user NAME)"
 fi
 
 place "$KIT_DIR/assets/files-folder.svg" "$DATA/icons/ubuntu-mac-kit/files-folder.svg"

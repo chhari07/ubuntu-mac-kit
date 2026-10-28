@@ -1,0 +1,14 @@
+{
+  "uuid": "desktop-stack@ubuntu-mac-kit",
+  "name": "Desktop Stack",
+  "description": "Mac-style pile of the photos and PDFs on your desktop, shown as scattered thumbnails.",
+  "shell-version": [
+    "46",
+    "47",
+    "48",
+    "49",
+    "50",
+    "51"
+  ],
+  "url": "https://github.com/chhari07/ubuntu-mac-kit"
+}

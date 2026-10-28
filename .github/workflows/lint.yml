@@ -19,9 +19,9 @@ jobs:
           shellcheck -s sh config/keep-mac-icons
 
       - name: Python syntax
-        run: python3 -m py_compile apps/desktop-note/note.py tools/*.py
+        run: python3 -m py_compile apps/desktop-note/note.py apps/github-widget/widget.py tools/*.py
 
       - name: JSON
         run: |
           python3 -m json.tool design/theme-tokens.json > /dev/null
-          python3 -m json.tool extension/macbar@ubuntu-mac-kit/metadata.json > /dev/null
+          for f in extension/*/metadata.json; do python3 -m json.tool "$f" > /dev/null; done

@@ -6,6 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- Dock magnification in Mac Bar: Ubuntu Dock icons grow under the pointer like the macOS dock, and an app's icon
+  bounces while it starts. Works with the dock on any screen edge.
+- Desktop Stack extension, installed with `--desktop-stack`: the newest photos and PDFs on the desktop are shown as a
+  scattered pile of thumbnails and hidden from the icon grid. Tiles and the pile can be dragged, and positions are kept.
+- GitHub widget, installed with `--github-user NAME`: a glass desktop card with the public contribution graph of
+  `NAME`, the past year's total, current and longest streak and today's count. A GitHub button in the top bar
+  toggles it and appears only when the widget is installed.
+
 ### Fixed
 
 - Sticky notes button on GNOME 50 and newer: left click now toggles the notes without also opening the menu.

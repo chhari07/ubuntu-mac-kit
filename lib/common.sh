@@ -7,6 +7,7 @@ KIT_NAME="Ubuntu Mac Kit"
 KIT_VERSION="1.1.0"
 RELEASES_URL="https://github.com/chhari07/ubuntu-mac-kit/releases/latest"
 EXT_UUID="macbar@ubuntu-mac-kit"
+STACK_UUID="desktop-stack@ubuntu-mac-kit"
 LEGACY_EXT_UUID="macbar@aman.local"   # extension ID used by 1.0.0
 
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
