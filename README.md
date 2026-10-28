@@ -130,7 +130,8 @@ removes the files the kit added and puts back any files it replaced. Log out and
   extensions are removed from that list, so extensions you enabled later stay on.
 - **Desktop Stack.** The 24 newest images and PDFs in `~/Desktop` form the pile. They are hidden from the desktop icon
   grid through `~/Desktop/.hidden`; turning the extension off removes exactly the entries it added. Double-click a
-  thumbnail to open the file, drag a thumbnail or the label to move it, right-click the label to tidy the pile, and
+  thumbnail to open it (images in Image Viewer, PDFs in Document Viewer); clicking outside that window closes it
+  again. Drag a thumbnail or the label to move it, right-click the label to tidy the pile, and
   click the label to open the Desktop folder. Files dropped on the pile are moved to the desktop.
 - **GitHub widget.** Reads the public contribution calendar at `github.com/users/NAME/contributions`, so no token is
   needed. It refreshes every hour, when the day changes and after the computer wakes. The user name is stored in

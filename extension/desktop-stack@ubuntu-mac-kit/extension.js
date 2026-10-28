@@ -5,6 +5,7 @@ import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -118,37 +119,78 @@ async function thumbnail(file, info) {
     return out;
 }
 
-// Opens a file in its default app and closes that app's window again as soon as
-// focus moves to some other window (a click outside it, e.g. on the desktop).
+// Viewer apps by file type; images use Image Viewer rather than whatever app
+// happens to own image/* (e.g. a design tool). Falls back to the default app.
+const VIEWERS = {pdf: ['org.gnome.Evince.desktop', 'org.gnome.Papers.desktop'],
+    image: ['org.gnome.Loupe.desktop', 'org.gnome.eog.desktop']};
+
+function viewerFor(file) {
+    const ids = ext(file.get_basename()) === 'pdf' ? VIEWERS.pdf : VIEWERS.image;
+    for (const id of ids) {
+        const app = Gio.DesktopAppInfo.new(id);
+        if (app)
+            return app;
+    }
+    return null;
+}
+
+// Opens a file in a viewer and closes that window again as soon as focus moves
+// to some other window (a click outside it, e.g. on the desktop).
 class Viewer {
     constructor() {
         this._window = null;
         this._waitUntil = 0;
         this._focusId = global.display.connect('notify::focus-window', () => this._onFocus());
+        this._createdId = global.display.connect('window-created', (d, w) => this._onCreated(w));
     }
 
     open(file) {
-        // The first new normal window to take focus within 10 s is the viewer.
+        // The first new window of the launched app within 30 s is the viewer.
+        this._close();
         this._known = new Set(global.display.list_all_windows());
-        this._waitUntil = GLib.get_monotonic_time() + 10 * GLib.USEC_PER_SEC;
-        Gio.AppInfo.launch_default_for_uri(file.get_uri(), global.create_app_launch_context(0, -1));
+        this._waitUntil = GLib.get_monotonic_time() + 30 * GLib.USEC_PER_SEC;
+        const ctx = global.create_app_launch_context(global.get_current_time(), -1);
+        const app = viewerFor(file);
+        this._appId = (app ?? Gio.AppInfo.get_default_for_type(
+            ext(file.get_basename()) === 'pdf' ? 'application/pdf' : 'image/png', false))?.get_id();
+        try {
+            if (app)
+                app.launch([file], ctx);
+            else
+                Gio.AppInfo.launch_default_for_uri(file.get_uri(), ctx);
+        } catch (e) {
+            this._waitUntil = 0;
+            logError(e, 'desktop-stack');
+        }
+    }
+
+    _onCreated(w) {
+        if (!this._waitUntil || this._known.has(w) || w.get_window_type() !== Meta.WindowType.NORMAL)
+            return;
+        // The window's app is only known once it is shown.
+        const shownId = w.connect('shown', () => {
+            w.disconnect(shownId);
+            if (!this._waitUntil || GLib.get_monotonic_time() > this._waitUntil ||
+                Shell.WindowTracker.get_default().get_window_app(w)?.get_id() !== this._appId)
+                return;
+            this._waitUntil = 0;
+            this._window = w;
+            this._unmanagedId = w.connect('unmanaged', () => this._untrack());
+            // Launched from a shell click, the window may not get focus by itself.
+            Main.activateWindow(w);
+        });
     }
 
     _onFocus() {
         const w = global.display.focus_window;
-        if (!w)
-            return;
-        if (this._window && w !== this._window && !this._belongs(w)) {
-            const old = this._window;
-            this._untrack();
-            old.delete(global.get_current_time());
-        }
-        if (this._waitUntil && GLib.get_monotonic_time() < this._waitUntil &&
-            !this._known.has(w) && w.get_window_type() === Meta.WindowType.NORMAL) {
-            this._waitUntil = 0;
-            this._window = w;
-            this._unmanagedId = w.connect('unmanaged', () => this._untrack());
-        }
+        if (w && this._window && w !== this._window && !this._belongs(w))
+            this._close();
+    }
+
+    _close() {
+        const old = this._window;
+        this._untrack();
+        old?.delete(global.get_current_time());
     }
 
     // Dialogs of the viewer (print, save as...) don't count as clicking outside.
@@ -168,6 +210,7 @@ class Viewer {
     destroy() {
         this._untrack();
         global.display.disconnect(this._focusId);
+        global.display.disconnect(this._createdId);
     }
 }
 
