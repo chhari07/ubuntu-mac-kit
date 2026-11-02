@@ -8,14 +8,15 @@ Copy one archive to a new machine, run `./install.sh`, then log out and back in.
 ![GNOME 46 to 51](https://img.shields.io/badge/GNOME%20Shell-46%20to%2051-4A86CF.svg)
 [![Lint](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml/badge.svg)](https://github.com/chhari07/ubuntu-mac-kit/actions/workflows/lint.yml)
 
+[![Watch the Ubuntu Mac Kit video](docs/media/brand-video.jpg)](docs/media/ubuntu-mac-kit-brand-16x9.mp4)
+
+**[Watch the video](docs/media/ubuntu-mac-kit-brand-16x9.mp4)** (14 seconds, with sound) · [Vertical version](docs/media/ubuntu-mac-kit-brand-9x16.mp4)
+
 ![A Mac-style desktop on Ubuntu, made with Ubuntu Mac Kit](docs/media/poster.jpg)
 
 The wallpaper is not included. Set your own with `./install.sh --wallpaper FILE`.
 
 ![Before and after installation](docs/media/preview.gif)
-
-**[Watch the full install walkthrough](https://github.com/chhari07/ubuntu-mac-kit/releases/download/v1.1.0/ubuntu-mac-kit-walkthrough-1080p.mp4)**
-(1080p, 62 seconds, with captions and sound)
 
 ## Contents
 
